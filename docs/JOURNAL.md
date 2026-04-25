@@ -2,7 +2,7 @@
 
 ## Executive Snapshot
 
-**Current focus:** Phase 1 complete and committed. P1 demo gate passes: `python scripts/demo.py --site-id WMT-0001` returns `{utility_eia_id, name}` for all 6,119 sites in under 2 seconds. Pipeline is end-to-end on seed data; production downloads activate automatically when network egress is unrestricted.
+**Current focus:** Phase 1 shipped to GitHub (`https://github.com/jasonpvella/Utility_Rate_calc.git`, branch `master`, 2 commits). Repo is live. Phase 2 is the immediate next milestone.
 
 **Next session priorities (Phase 2):**
 - Stand up URDB client (`src/voltregistry/ingest/urdb_client.py`) — fetch tariff list for each of the 5 reference utility EIA IDs, cache to `data/raw/urdb/`.
@@ -14,6 +14,21 @@
 ---
 
 ## Historical Log
+
+### 2026-04-25 (GitHub push + housekeeping)
+
+**What changed:**
+- Pushed Phase 1 codebase to GitHub: `https://github.com/jasonpvella/Utility_Rate_calc.git`, branch `master`.
+- Two commits on remote: `3f9ef56` (Phase 1 full codebase) and `726cdff` (journal + CLAUDE.md).
+- Updated `CLAUDE.md` Terminal Commands section: rule now explicitly says to run all commands directly via Bash by default; only hand a command to Jason when sandbox execution would cost significantly more tokens than it saves.
+- No schema, engine, or test changes. No golden run required.
+
+**Key constraint noted:**
+- Sandbox cannot authenticate to GitHub (no credential store) — git push must always be run from Jason's Mac Terminal. Git lock files (`index.lock`, `HEAD.lock`, `refs/heads/master.lock`) accumulate on the mounted filesystem from sandbox git operations and must be manually removed before committing from the Mac.
+
+**What's next:** Phase 2 — URDB ingestion, 5 reference tariff JSON files, delivery/supply classifier, P2 API demo gate.
+
+---
 
 ### 2026-04-25 (Phase 1 build)
 
