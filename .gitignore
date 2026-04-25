@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+
+# Data (raw downloads and generated DB — not committed per spec rule #1)
+data/raw/
+data/voltregistry.db
+data/territories.gpkg
+data/territories.tmp_path
+
+# Alembic
+alembic/versions/__pycache__/
+
+# Test / CI
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+pytest-cache-files-*/
+
+# IDE
+.DS_Store
+.vscode/
+.idea/
