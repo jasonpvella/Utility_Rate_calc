@@ -2,7 +2,9 @@
 
 ## Terminal Commands
 
-Never ask Jason to run commands manually. Use Bash directly:
+Always run terminal commands directly via Bash rather than asking Jason to run them. The one exception: if a command is trivial to type (e.g. a single short `git` command) and running it from the sandbox would cost significantly more tokens than it saves in back-and-forth, hand it to Jason with the exact command to paste — but this should be rare. Default is always to run it yourself.
+
+Use Bash directly for:
 - Type check: `mypy src/voltregistry`
 - Lint: `ruff check src/ tests/`
 - Format: `ruff format src/ tests/`
