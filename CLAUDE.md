@@ -57,7 +57,7 @@ When Jason says "Save Project":
 2. Rewrite `## Executive Snapshot` in `docs/JOURNAL.md` — current focus + next session priorities.
 3. Append a dated `### YYYY-MM-DD` entry to `## Historical Log` with the session delta (decisions, what changed, what's next).
 4. If schemas or engine logic changed: confirm `pytest -q` passes, then run `pytest -q tests/golden/` and report the results in the journal entry.
-5. From repo root: `git add -A && git commit -m "chore: save project $(date +%Y-%m-%d)" && git push`
+5. From repo root via Bash: `find .git -name "*.lock" -delete 2>/dev/null; git add -A && git commit -m "chore: save project $(date +%Y-%m-%d)" && git push`
 
 (No deploy step in v0 — VoltRegistry is a backend-only project until a UI is added.)
 
