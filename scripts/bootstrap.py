@@ -1,6 +1,6 @@
-"""VoltRegistry Phase 1 bootstrap — end-to-end ingestion pipeline.
+"""VoltRegistry bootstrap — end-to-end ingestion pipeline.
 
-Runs all Phase 1 ingest steps in order, then persists to SQLite.
+Runs all ingest steps in order, then persists to SQLite.
 Idempotent: safe to re-run.  Use --force-refresh to re-download data.
 
 Usage:
@@ -16,7 +16,8 @@ Pipeline steps:
     5. Run geospatial territory join → site → utility_eia_id
     6. Persist utilities to SQLite
     7. Persist sites (with utility assignments) to SQLite
-    8. Print summary counts and match rate
+    8. Load reference tariff JSON files into SQLite  [Phase 2]
+    9. Print summary counts and match rate
 """
 from __future__ import annotations
 
@@ -31,15 +32,16 @@ from pathlib import Path
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT / "src"))
 
-from sqlmodel import Session, select
+from sqlmodel import Session
 
 from voltregistry.db import create_db_and_tables, engine
 from voltregistry.ingest.eia_form_861 import load_utilities_with_fallback
 from voltregistry.ingest.hifld_territories import load_territories
-from voltregistry.ingest.walmart_scraper import load_stores as load_walmart
 from voltregistry.ingest.samsclub_scraper import load_stores as load_samsclub
+from voltregistry.ingest.walmart_scraper import load_stores as load_walmart
 from voltregistry.mapping.territory_join import join_sites_to_territories
-from voltregistry.models import SiteTable, UtilityTable
+from voltregistry.models import SiteTable, TariffTable, UtilityTable
+from voltregistry.tariffs.models import TariffBundle
 
 logging.basicConfig(
     level=logging.INFO,
@@ -115,30 +117,74 @@ def _upsert_sites(
     return count
 
 
+_REFERENCE_DIR = _REPO_ROOT / "src" / "voltregistry" / "tariffs" / "reference"
+
+
+def _upsert_tariffs(session: Session) -> int:
+    """Load all reference/ JSON files into the tariff table.  Returns count upserted."""
+    count = 0
+    for json_path in sorted(_REFERENCE_DIR.glob("*.json")):
+        try:
+            bundle = TariffBundle.model_validate_json(json_path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            logger.warning("Skipping %s — parse error: %s", json_path.name, exc)
+            continue
+
+        t = bundle.tariff
+        existing = session.get(TariffTable, t.tariff_id)
+        payload = bundle.model_dump_json()
+
+        if existing:
+            existing.name = t.name
+            existing.rate_code = t.rate_code
+            existing.availability = t.availability.value if hasattr(t.availability, "value") else str(t.availability)
+            existing.effective_date = t.effective_date
+            existing.end_date = t.end_date
+            existing.payload_json = payload
+            existing.last_updated = datetime.utcnow()
+        else:
+            row = TariffTable(
+                tariff_id=t.tariff_id,
+                utility_eia_id=t.utility_eia_id,
+                name=t.name,
+                rate_code=t.rate_code,
+                availability=t.availability.value if hasattr(t.availability, "value") else str(t.availability),
+                effective_date=t.effective_date,
+                end_date=t.end_date,
+                payload_json=payload,
+                last_updated=datetime.utcnow(),
+            )
+            session.add(row)
+        count += 1
+
+    session.commit()
+    return count
+
+
 def run(force_refresh: bool = False) -> None:
     t0 = time.time()
 
     # -----------------------------------------------------------------------
     # Step 1: DB setup
     # -----------------------------------------------------------------------
-    logger.info("Step 1/7: Initialising database")
+    logger.info("Step 1/8: Initialising database")
     create_db_and_tables()
 
     # -----------------------------------------------------------------------
     # Step 2: EIA Form 861 utilities
     # -----------------------------------------------------------------------
-    logger.info("Step 2/7: Loading EIA utility metadata")
+    logger.info("Step 2/8: Loading EIA utility metadata")
     utilities = load_utilities_with_fallback()
     logger.info("  → %d utilities loaded", len(utilities))
 
     # -----------------------------------------------------------------------
     # Step 3: Store locations
     # -----------------------------------------------------------------------
-    logger.info("Step 3/7: Loading Walmart store locations")
+    logger.info("Step 3/8: Loading Walmart store locations")
     walmart_stores = load_walmart(force_refresh=force_refresh)
     logger.info("  → %d Walmart stores", len(walmart_stores))
 
-    logger.info("Step 4/7: Loading Sam's Club store locations")
+    logger.info("Step 4/8: Loading Sam's Club store locations")
     samsclub_stores = load_samsclub(force_refresh=force_refresh)
     logger.info("  → %d Sam's Club stores", len(samsclub_stores))
 
@@ -154,11 +200,11 @@ def run(force_refresh: bool = False) -> None:
     # -----------------------------------------------------------------------
     # Step 5: HIFLD territories + spatial join
     # -----------------------------------------------------------------------
-    logger.info("Step 5/7: Loading territory polygons")
+    logger.info("Step 5/8: Loading territory polygons")
     territories = load_territories(force_refresh=force_refresh)
     logger.info("  → %d territory polygons", len(territories))
 
-    logger.info("Step 6/7: Running geospatial territory join")
+    logger.info("Step 6/8: Running geospatial territory join")
     join_results_list = join_sites_to_territories(all_stores, territories=territories)
     join_results = {r["site_id"]: r for r in join_results_list}
 
@@ -170,9 +216,9 @@ def run(force_refresh: bool = False) -> None:
     )
 
     # -----------------------------------------------------------------------
-    # Step 7: Persist to SQLite
+    # Step 7: Persist utilities + sites to SQLite
     # -----------------------------------------------------------------------
-    logger.info("Step 7/7: Persisting to SQLite")
+    logger.info("Step 7/8: Persisting utilities and sites to SQLite")
     with Session(engine) as session:
         util_count = _upsert_utilities(session, utilities)
         logger.info("  → %d utilities upserted", util_count)
@@ -184,24 +230,33 @@ def run(force_refresh: bool = False) -> None:
         logger.info("  → %d Sam's Club sites upserted", sam_count)
 
     # -----------------------------------------------------------------------
+    # Step 8: Load reference tariff JSON files [Phase 2]
+    # -----------------------------------------------------------------------
+    logger.info("Step 8/8: Loading reference tariff JSON files")
+    with Session(engine) as session:
+        tariff_count = _upsert_tariffs(session)
+    logger.info("  → %d tariffs upserted", tariff_count)
+
+    # -----------------------------------------------------------------------
     # Summary
     # -----------------------------------------------------------------------
     elapsed = time.time() - t0
     print("\n" + "=" * 60)
-    print("VoltRegistry Phase 1 Bootstrap Complete")
+    print("VoltRegistry Bootstrap Complete")
     print("=" * 60)
     print(f"  Utilities loaded    : {util_count:>6,}")
     print(f"  Walmart sites       : {wmt_count:>6,}")
     print(f"  Sam's Club sites    : {sam_count:>6,}")
     print(f"  Total sites         : {wmt_count + sam_count:>6,}")
     print(f"  Utility match rate  : {100.0 * matched / total:.1f}%  ({matched}/{total})")
+    print(f"  Reference tariffs   : {tariff_count:>6,}")
     print(f"  Elapsed             : {elapsed:.1f}s")
     print("=" * 60)
-    print(f"\nNext: python scripts/demo.py --site-id WMT-0001")
+    print("\nP2 demo gate: curl http://localhost:8000/utilities/6452/tariffs")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="VoltRegistry Phase 1 bootstrap")
+    parser = argparse.ArgumentParser(description="VoltRegistry bootstrap")
     parser.add_argument(
         "--force-refresh",
         action="store_true",

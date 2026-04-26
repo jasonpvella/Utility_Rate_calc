@@ -1,0 +1,238 @@
+{
+  "tariff": {
+    "tariff_id": "georgia-power-lps",
+    "utility_eia_id": "7140",
+    "urdb_id": null,
+    "name": "Large Power Service (LPS)",
+    "rate_code": "LPS",
+    "effective_date": "2024-01-01",
+    "end_date": null,
+    "version": "1",
+    "availability": "optional",
+    "eligibility": {
+      "min_kw": 900.0,
+      "max_kw": null,
+      "min_kwh_annual": null,
+      "max_kwh_annual": null,
+      "voltage_required": ["primary", "transmission"],
+      "customer_classes": ["commercial", "industrial"],
+      "load_factor_min": null,
+      "term_commitment_months": 60,
+      "notes": "Available to non-residential customers with measured demand of 900 kW or greater. Requires minimum 5-year contract. Regulated GA vertically integrated utility."
+    },
+    "tou_schedule_id": "georgia-power-lps-tou",
+    "charges": [
+      "georgia-power-lps-customer",
+      "georgia-power-lps-energy-summer-on",
+      "georgia-power-lps-energy-summer-off",
+      "georgia-power-lps-energy-winter",
+      "georgia-power-lps-demand",
+      "georgia-power-lps-fuel",
+      "georgia-power-lps-rev-norm",
+      "georgia-power-lps-env-compliance",
+      "georgia-power-lps-grt"
+    ],
+    "rules": ["georgia-power-lps-ratchet"],
+    "source_document": "https://www.georgiapower.com/content/dam/georgia-power/pdfs/business-pdfs/rates-schedules/LPS.pdf",
+    "ingestion_method": "manual",
+    "delivery_supply_review_status": "manually_reviewed"
+  },
+  "charges": [
+    {
+      "charge_id": "georgia-power-lps-customer",
+      "tariff_id": "georgia-power-lps",
+      "name": "Customer Charge",
+      "type": "fixed",
+      "demand_basis": null,
+      "unit": "$/month",
+      "value": 1250.00,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Customer charge — covers metering and service connection (delivery infrastructure)."
+      }
+    },
+    {
+      "charge_id": "georgia-power-lps-energy-summer-on",
+      "tariff_id": "georgia-power-lps",
+      "name": "Energy Charge — Summer On-Peak",
+      "type": "energy",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.05891,
+      "applies_to": {"season": "summer", "tou_period": "on_peak", "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "Summer on-peak energy charge in vertically integrated utility — primarily generation/supply."
+      }
+    },
+    {
+      "charge_id": "georgia-power-lps-energy-summer-off",
+      "tariff_id": "georgia-power-lps",
+      "name": "Energy Charge — Summer Off-Peak",
+      "type": "energy",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.03124,
+      "applies_to": {"season": "summer", "tou_period": "off_peak", "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "Summer off-peak energy charge in vertically integrated utility — primarily generation/supply."
+      }
+    },
+    {
+      "charge_id": "georgia-power-lps-energy-winter",
+      "tariff_id": "georgia-power-lps",
+      "name": "Energy Charge — Winter",
+      "type": "energy",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.02875,
+      "applies_to": {"season": "winter", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "Winter energy charge in vertically integrated utility — primarily generation/supply."
+      }
+    },
+    {
+      "charge_id": "georgia-power-lps-demand",
+      "tariff_id": "georgia-power-lps",
+      "name": "Distribution Demand Charge",
+      "type": "demand",
+      "demand_basis": "ncp",
+      "unit": "$/kW",
+      "value": 18.45,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Demand charge in regulated market — distribution infrastructure cost recovery."
+      }
+    },
+    {
+      "charge_id": "georgia-power-lps-fuel",
+      "tariff_id": "georgia-power-lps",
+      "name": "Fuel Cost Recovery Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.03145,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Fuel cost recovery — pass-through for fossil and purchased power fuel (supply)."
+      }
+    },
+    {
+      "charge_id": "georgia-power-lps-rev-norm",
+      "tariff_id": "georgia-power-lps",
+      "name": "Revenue Normalization Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.00214,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.85,
+        "method": "manual",
+        "reasoning": "Revenue normalization — decoupling mechanism reconciling distribution revenue (delivery)."
+      }
+    },
+    {
+      "charge_id": "georgia-power-lps-env-compliance",
+      "tariff_id": "georgia-power-lps",
+      "name": "Environmental Compliance Cost Recovery Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.00342,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.7,
+        "method": "manual",
+        "reasoning": "Environmental compliance — recovers capital costs of generation environmental controls; treated as delivery per spec §7 percentage-rider rule, but borderline since it relates to generation assets."
+      }
+    },
+    {
+      "charge_id": "georgia-power-lps-grt",
+      "tariff_id": "georgia-power-lps",
+      "name": "Gross Receipts Tax Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "percent",
+      "value": 0.029,
+      "applies_to": {
+        "season": "all",
+        "tou_period": null,
+        "applied_to_charge_ids": [
+          "georgia-power-lps-customer",
+          "georgia-power-lps-demand",
+          "georgia-power-lps-rev-norm",
+          "georgia-power-lps-env-compliance"
+        ]
+      },
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "Gross receipts tax — percentage rider applied only to delivery-classified charges per spec §7 percentage-rider rule."
+      }
+    }
+  ],
+  "tou_schedule": {
+    "tou_schedule_id": "georgia-power-lps-tou",
+    "periods": [
+      {
+        "name": "on_peak",
+        "season_months": [6, 7, 8, 9],
+        "hour_ranges": [{"start": 14, "end": 19}],
+        "weekday_mask": "weekdays",
+        "holidays_off_peak": true
+      },
+      {
+        "name": "off_peak",
+        "season_months": [6, 7, 8, 9],
+        "hour_ranges": [{"start": 19, "end": 23}, {"start": 0, "end": 14}],
+        "weekday_mask": "all",
+        "holidays_off_peak": true
+      }
+    ],
+    "holiday_calendar": "nerc",
+    "holiday_dates": []
+  },
+  "rules": [
+    {
+      "rule_id": "georgia-power-lps-ratchet",
+      "type": "demand_ratchet",
+      "parameters": {
+        "ratchet_percent": 80.0,
+        "ratchet_window_months": 12,
+        "ratchet_window_type": "seasonal",
+        "ratchet_source_months": [6, 7, 8, 9],
+        "minimum_monthly_charge": null
+      }
+    }
+  ]
+}

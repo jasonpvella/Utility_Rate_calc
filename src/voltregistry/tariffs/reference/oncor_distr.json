@@ -1,0 +1,125 @@
+{
+  "tariff": {
+    "tariff_id": "oncor-distr",
+    "utility_eia_id": "40229",
+    "urdb_id": null,
+    "name": "Distribution Service Tariff (DISTR)",
+    "rate_code": "DISTR",
+    "effective_date": "2024-03-01",
+    "end_date": null,
+    "version": "1",
+    "availability": "mandatory",
+    "eligibility": {
+      "min_kw": null,
+      "max_kw": null,
+      "min_kwh_annual": null,
+      "max_kwh_annual": null,
+      "voltage_required": ["secondary", "primary", "transmission"],
+      "customer_classes": ["commercial", "industrial"],
+      "load_factor_min": null,
+      "term_commitment_months": null,
+      "notes": "ERCOT deregulated market — Oncor provides regulated wires/distribution service only. Customer procures supply (energy + capacity) from a competitive Retail Electric Provider (REP). All charges on this tariff are delivery."
+    },
+    "tou_schedule_id": null,
+    "charges": [
+      "oncor-distr-customer",
+      "oncor-distr-demand",
+      "oncor-distr-transmission",
+      "oncor-distr-sbf",
+      "oncor-distr-nuclear-decom"
+    ],
+    "rules": [],
+    "source_document": "https://www.oncor.com/content/dam/oncor/documents/tariffs/dist-tariff.pdf",
+    "ingestion_method": "manual",
+    "delivery_supply_review_status": "manually_reviewed"
+  },
+  "charges": [
+    {
+      "charge_id": "oncor-distr-customer",
+      "tariff_id": "oncor-distr",
+      "name": "Customer Charge",
+      "type": "fixed",
+      "demand_basis": null,
+      "unit": "$/month",
+      "value": 47.16,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Customer charge — distribution service (deregulated TX market, Oncor is wires-only)."
+      }
+    },
+    {
+      "charge_id": "oncor-distr-demand",
+      "tariff_id": "oncor-distr",
+      "name": "Distribution Demand Charge",
+      "type": "demand",
+      "demand_basis": "ncp",
+      "unit": "$/kW",
+      "value": 3.87421,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Distribution system demand charge — wires charge (delivery, deregulated TX)."
+      }
+    },
+    {
+      "charge_id": "oncor-distr-transmission",
+      "tariff_id": "oncor-distr",
+      "name": "Transmission Cost Recovery Factor",
+      "type": "demand",
+      "demand_basis": "cp",
+      "unit": "$/kW",
+      "value": 5.41825,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Transmission cost recovery — TCOS pass-through, delivery infrastructure (TX 4CP)."
+      }
+    },
+    {
+      "charge_id": "oncor-distr-sbf",
+      "tariff_id": "oncor-distr",
+      "name": "System Benefit Fund Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.00007,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "System benefit fund — non-bypassable surcharge collected by TDU (delivery)."
+      }
+    },
+    {
+      "charge_id": "oncor-distr-nuclear-decom",
+      "tariff_id": "oncor-distr",
+      "name": "Nuclear Decommissioning Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.00021,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "Nuclear decommissioning trust funding — non-bypassable charge collected on the wires bill in deregulated TX market (treated as delivery in this tariff)."
+      }
+    }
+  ],
+  "tou_schedule": null,
+  "rules": []
+}

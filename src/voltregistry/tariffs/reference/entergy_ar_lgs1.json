@@ -1,0 +1,143 @@
+{
+  "tariff": {
+    "tariff_id": "entergy-ar-lgs1",
+    "utility_eia_id": "6452",
+    "urdb_id": null,
+    "name": "Large General Service (LGS-1)",
+    "rate_code": "LGS-1",
+    "effective_date": "2024-01-01",
+    "end_date": null,
+    "version": "1",
+    "availability": "mandatory",
+    "eligibility": {
+      "min_kw": 500.0,
+      "max_kw": null,
+      "min_kwh_annual": null,
+      "max_kwh_annual": null,
+      "voltage_required": ["secondary", "primary"],
+      "customer_classes": ["commercial", "industrial"],
+      "load_factor_min": null,
+      "term_commitment_months": 12,
+      "notes": "Available to non-residential customers with measured demand of 500 kW or greater for any three months in the preceding twelve. Vertically integrated regulated utility — supply and delivery are bundled."
+    },
+    "tou_schedule_id": null,
+    "charges": [
+      "entergy-ar-lgs1-customer",
+      "entergy-ar-lgs1-energy-summer",
+      "entergy-ar-lgs1-energy-winter",
+      "entergy-ar-lgs1-demand",
+      "entergy-ar-lgs1-fuel-adj",
+      "entergy-ar-lgs1-seca"
+    ],
+    "rules": [],
+    "source_document": "https://entergy-arkansas.com/content/rates/LGS-1.pdf",
+    "ingestion_method": "manual",
+    "delivery_supply_review_status": "manually_reviewed"
+  },
+  "charges": [
+    {
+      "charge_id": "entergy-ar-lgs1-customer",
+      "tariff_id": "entergy-ar-lgs1",
+      "name": "Customer Charge",
+      "type": "fixed",
+      "demand_basis": null,
+      "unit": "$/month",
+      "value": 285.00,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Fixed monthly customer charge — covers metering, billing, and service connection (delivery infrastructure)."
+      }
+    },
+    {
+      "charge_id": "entergy-ar-lgs1-energy-summer",
+      "tariff_id": "entergy-ar-lgs1",
+      "name": "Energy Charge — Summer",
+      "type": "energy",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.03142,
+      "applies_to": {"season": "summer", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "Base energy charge in regulated vertically integrated utility — primarily covers generation/supply."
+      }
+    },
+    {
+      "charge_id": "entergy-ar-lgs1-energy-winter",
+      "tariff_id": "entergy-ar-lgs1",
+      "name": "Energy Charge — Winter",
+      "type": "energy",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.02684,
+      "applies_to": {"season": "winter", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "Base energy charge in regulated vertically integrated utility — primarily covers generation/supply."
+      }
+    },
+    {
+      "charge_id": "entergy-ar-lgs1-demand",
+      "tariff_id": "entergy-ar-lgs1",
+      "name": "Distribution Demand Charge",
+      "type": "demand",
+      "demand_basis": "ncp",
+      "unit": "$/kW",
+      "value": 12.45,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Demand charge in regulated market — distribution infrastructure cost recovery."
+      }
+    },
+    {
+      "charge_id": "entergy-ar-lgs1-fuel-adj",
+      "tariff_id": "entergy-ar-lgs1",
+      "name": "Fuel Adjustment Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.02156,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Fuel adjustment rider — pass-through for fuel and purchased power costs (supply)."
+      }
+    },
+    {
+      "charge_id": "entergy-ar-lgs1-seca",
+      "tariff_id": "entergy-ar-lgs1",
+      "name": "System Energy Cost Adjustment Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.00385,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "System energy cost adjustment — recovers wholesale Entergy system energy costs (supply)."
+      }
+    }
+  ],
+  "tou_schedule": null,
+  "rules": []
+}

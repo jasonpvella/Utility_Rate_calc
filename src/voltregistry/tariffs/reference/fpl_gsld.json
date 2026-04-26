@@ -1,0 +1,149 @@
+{
+  "tariff": {
+    "tariff_id": "fpl-gsld",
+    "utility_eia_id": "6455",
+    "urdb_id": null,
+    "name": "General Service Large Demand (GSLD-1)",
+    "rate_code": "GSLD-1",
+    "effective_date": "2024-01-01",
+    "end_date": null,
+    "version": "1",
+    "availability": "mandatory",
+    "eligibility": {
+      "min_kw": 200.0,
+      "max_kw": 2000.0,
+      "min_kwh_annual": null,
+      "max_kwh_annual": null,
+      "voltage_required": ["secondary", "primary"],
+      "customer_classes": ["commercial", "industrial"],
+      "load_factor_min": null,
+      "term_commitment_months": null,
+      "notes": "Available to non-residential customers with measured demand of 200 kW–2,000 kW for any 12 consecutive months. Regulated FL vertically integrated utility."
+    },
+    "tou_schedule_id": null,
+    "charges": [
+      "fpl-gsld-customer",
+      "fpl-gsld-energy-tiered",
+      "fpl-gsld-demand-tiered",
+      "fpl-gsld-fuel",
+      "fpl-gsld-storm",
+      "fpl-gsld-capacity"
+    ],
+    "rules": [],
+    "source_document": "https://www.fpl.com/rates/general-service-large-demand.html",
+    "ingestion_method": "manual",
+    "delivery_supply_review_status": "manually_reviewed"
+  },
+  "charges": [
+    {
+      "charge_id": "fpl-gsld-customer",
+      "tariff_id": "fpl-gsld",
+      "name": "Customer Charge",
+      "type": "fixed",
+      "demand_basis": null,
+      "unit": "$/month",
+      "value": 305.00,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Customer charge — covers metering and service connection (delivery infrastructure)."
+      }
+    },
+    {
+      "charge_id": "fpl-gsld-energy-tiered",
+      "tariff_id": "fpl-gsld",
+      "name": "Non-Fuel Energy Charge",
+      "type": "energy",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": null,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [
+        {"min": 0, "max": 200000, "rate": 0.01284, "tier_basis": "kwh_monthly"},
+        {"min": 200000, "max": null, "rate": 0.00872, "tier_basis": "kwh_monthly"}
+      ],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "Non-fuel energy charge in vertically integrated utility — primarily generation/supply (fuel handled separately)."
+      }
+    },
+    {
+      "charge_id": "fpl-gsld-demand-tiered",
+      "tariff_id": "fpl-gsld",
+      "name": "Distribution Demand Charge",
+      "type": "demand",
+      "demand_basis": "ncp",
+      "unit": "$/kW",
+      "value": null,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [
+        {"min": 0, "max": 500, "rate": 11.45, "tier_basis": "kw_billed"},
+        {"min": 500, "max": null, "rate": 8.92, "tier_basis": "kw_billed"}
+      ],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Tiered demand charge in regulated market — distribution infrastructure cost recovery."
+      }
+    },
+    {
+      "charge_id": "fpl-gsld-fuel",
+      "tariff_id": "fpl-gsld",
+      "name": "Fuel Charge",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.03578,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Fuel charge — pass-through for fossil generation fuel costs (supply)."
+      }
+    },
+    {
+      "charge_id": "fpl-gsld-storm",
+      "tariff_id": "fpl-gsld",
+      "name": "Storm Charge Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.00131,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "Storm charge — recovers distribution restoration costs from named storms (delivery infrastructure)."
+      }
+    },
+    {
+      "charge_id": "fpl-gsld-capacity",
+      "tariff_id": "fpl-gsld",
+      "name": "Capacity Cost Recovery Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.00425,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Capacity cost recovery — recovers purchased capacity contract costs (supply)."
+      }
+    }
+  ],
+  "tou_schedule": null,
+  "rules": []
+}

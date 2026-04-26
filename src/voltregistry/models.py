@@ -1,4 +1,4 @@
-"""SQLModel table models for VoltRegistry Phase 1.
+"""SQLModel table models for VoltRegistry.
 
 These are the persistence-layer models (SQLite tables).  The richer Pydantic
 schema models (Tariff, Charge, TouSchedule, Rule) live in
@@ -50,4 +50,24 @@ class SiteTable(SQLModel, table=True):
     utility_eia_id: str | None = Field(default=None, foreign_key="utility.eia_id")
     current_tariff_id: str | None = Field(default=None)
     data_source: str = "scraped"  # "scraped" | "uploaded" | "manual"
+    last_updated: datetime = Field(default_factory=datetime.utcnow)
+
+
+class TariffTable(SQLModel, table=True):
+    """One row per tariff.  Full TariffBundle payload stored as JSON.
+
+    Key fields are hoisted out of the JSON for SQL-level filtering; the
+    canonical source of truth is ``payload_json`` (a serialised TariffBundle).
+    """
+
+    __tablename__ = "tariff"
+
+    tariff_id: str = Field(primary_key=True)
+    utility_eia_id: str = Field(foreign_key="utility.eia_id", index=True)
+    name: str
+    rate_code: str = ""
+    availability: str = "optional"   # mandatory | optional | closed_to_new
+    effective_date: str = ""         # YYYY-MM-DD
+    end_date: str | None = Field(default=None)
+    payload_json: str                # JSON-serialised TariffBundle
     last_updated: datetime = Field(default_factory=datetime.utcnow)

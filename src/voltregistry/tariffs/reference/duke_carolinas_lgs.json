@@ -1,0 +1,243 @@
+{
+  "tariff": {
+    "tariff_id": "duke-carolinas-lgs",
+    "utility_eia_id": "5416",
+    "urdb_id": null,
+    "name": "Large General Service (LGS)",
+    "rate_code": "LGS",
+    "effective_date": "2024-01-01",
+    "end_date": null,
+    "version": "1",
+    "availability": "optional",
+    "eligibility": {
+      "min_kw": 1000.0,
+      "max_kw": null,
+      "min_kwh_annual": null,
+      "max_kwh_annual": null,
+      "voltage_required": ["secondary", "primary"],
+      "customer_classes": ["commercial", "industrial"],
+      "load_factor_min": null,
+      "term_commitment_months": 12,
+      "notes": "Available to non-residential customers whose maximum measured demand has equaled or exceeded 1,000 kW for at least three of the last twelve months. Regulated NC/SC vertically integrated utility."
+    },
+    "tou_schedule_id": "duke-carolinas-lgs-tou",
+    "charges": [
+      "duke-carolinas-lgs-customer",
+      "duke-carolinas-lgs-energy-summer-on",
+      "duke-carolinas-lgs-energy-summer-off",
+      "duke-carolinas-lgs-energy-winter-on",
+      "duke-carolinas-lgs-energy-winter-off",
+      "duke-carolinas-lgs-demand",
+      "duke-carolinas-lgs-fuel",
+      "duke-carolinas-lgs-nuclear-fuel",
+      "duke-carolinas-lgs-rep"
+    ],
+    "rules": ["duke-carolinas-lgs-ratchet"],
+    "source_document": "https://www.duke-energy.com/home/products/rate-schedules",
+    "ingestion_method": "manual",
+    "delivery_supply_review_status": "manually_reviewed"
+  },
+  "charges": [
+    {
+      "charge_id": "duke-carolinas-lgs-customer",
+      "tariff_id": "duke-carolinas-lgs",
+      "name": "Customer Charge",
+      "type": "fixed",
+      "demand_basis": null,
+      "unit": "$/month",
+      "value": 850.00,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Customer charge covers metering, billing, and service drop infrastructure (delivery)."
+      }
+    },
+    {
+      "charge_id": "duke-carolinas-lgs-energy-summer-on",
+      "tariff_id": "duke-carolinas-lgs",
+      "name": "Energy Charge — Summer On-Peak",
+      "type": "energy",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.04812,
+      "applies_to": {"season": "summer", "tou_period": "on_peak", "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "On-peak energy charge in vertically integrated utility — primarily generation/supply."
+      }
+    },
+    {
+      "charge_id": "duke-carolinas-lgs-energy-summer-off",
+      "tariff_id": "duke-carolinas-lgs",
+      "name": "Energy Charge — Summer Off-Peak",
+      "type": "energy",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.03217,
+      "applies_to": {"season": "summer", "tou_period": "off_peak", "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "Off-peak energy charge in vertically integrated utility — primarily generation/supply."
+      }
+    },
+    {
+      "charge_id": "duke-carolinas-lgs-energy-winter-on",
+      "tariff_id": "duke-carolinas-lgs",
+      "name": "Energy Charge — Winter On-Peak",
+      "type": "energy",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.04125,
+      "applies_to": {"season": "winter", "tou_period": "on_peak", "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "On-peak energy charge in vertically integrated utility — primarily generation/supply."
+      }
+    },
+    {
+      "charge_id": "duke-carolinas-lgs-energy-winter-off",
+      "tariff_id": "duke-carolinas-lgs",
+      "name": "Energy Charge — Winter Off-Peak",
+      "type": "energy",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.02894,
+      "applies_to": {"season": "winter", "tou_period": "off_peak", "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.9,
+        "method": "manual",
+        "reasoning": "Off-peak energy charge in vertically integrated utility — primarily generation/supply."
+      }
+    },
+    {
+      "charge_id": "duke-carolinas-lgs-demand",
+      "tariff_id": "duke-carolinas-lgs",
+      "name": "Distribution Demand Charge",
+      "type": "demand",
+      "demand_basis": "ncp",
+      "unit": "$/kW",
+      "value": 14.62,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "delivery",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Demand charge in regulated market — distribution infrastructure cost recovery."
+      }
+    },
+    {
+      "charge_id": "duke-carolinas-lgs-fuel",
+      "tariff_id": "duke-carolinas-lgs",
+      "name": "Fuel Cost Adjustment Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.02478,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Fuel cost adjustment — pass-through for fossil and purchased power fuel (supply)."
+      }
+    },
+    {
+      "charge_id": "duke-carolinas-lgs-nuclear-fuel",
+      "tariff_id": "duke-carolinas-lgs",
+      "name": "Nuclear Fuel Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.00432,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.95,
+        "method": "manual",
+        "reasoning": "Nuclear fuel rider — pass-through for nuclear fuel costs (supply)."
+      }
+    },
+    {
+      "charge_id": "duke-carolinas-lgs-rep",
+      "tariff_id": "duke-carolinas-lgs",
+      "name": "Renewable Energy Portfolio Rider",
+      "type": "rider",
+      "demand_basis": null,
+      "unit": "$/kWh",
+      "value": 0.00187,
+      "applies_to": {"season": "all", "tou_period": null, "applied_to_charge_ids": []},
+      "tiers": [],
+      "classification": {
+        "category": "supply",
+        "confidence": 0.85,
+        "method": "manual",
+        "reasoning": "Renewable energy portfolio standard cost recovery — funds REC procurement (supply)."
+      }
+    }
+  ],
+  "tou_schedule": {
+    "tou_schedule_id": "duke-carolinas-lgs-tou",
+    "periods": [
+      {
+        "name": "on_peak",
+        "season_months": [6, 7, 8, 9],
+        "hour_ranges": [{"start": 6, "end": 22}],
+        "weekday_mask": "weekdays",
+        "holidays_off_peak": true
+      },
+      {
+        "name": "off_peak",
+        "season_months": [6, 7, 8, 9],
+        "hour_ranges": [{"start": 22, "end": 23}, {"start": 0, "end": 6}],
+        "weekday_mask": "all",
+        "holidays_off_peak": true
+      },
+      {
+        "name": "on_peak",
+        "season_months": [1, 2, 3, 4, 5, 10, 11, 12],
+        "hour_ranges": [{"start": 6, "end": 13}, {"start": 16, "end": 21}],
+        "weekday_mask": "weekdays",
+        "holidays_off_peak": true
+      },
+      {
+        "name": "off_peak",
+        "season_months": [1, 2, 3, 4, 5, 10, 11, 12],
+        "hour_ranges": [{"start": 13, "end": 16}, {"start": 21, "end": 23}, {"start": 0, "end": 6}],
+        "weekday_mask": "all",
+        "holidays_off_peak": true
+      }
+    ],
+    "holiday_calendar": "nerc",
+    "holiday_dates": []
+  },
+  "rules": [
+    {
+      "rule_id": "duke-carolinas-lgs-ratchet",
+      "type": "demand_ratchet",
+      "parameters": {
+        "ratchet_percent": 60.0,
+        "ratchet_window_months": 12,
+        "ratchet_window_type": "rolling",
+        "ratchet_source_months": [],
+        "minimum_monthly_charge": null
+      }
+    }
+  ]
+}

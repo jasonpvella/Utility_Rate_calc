@@ -308,3 +308,22 @@ class Tariff(BaseModel):
     delivery_supply_review_status: DeliverySupplyReviewStatus = (
         DeliverySupplyReviewStatus.auto_classified
     )
+
+
+# ---------------------------------------------------------------------------
+# TariffBundle — self-contained payload for reference/ JSON files and DB
+# ---------------------------------------------------------------------------
+
+
+class TariffBundle(BaseModel):
+    """Self-contained tariff payload stored in reference/ JSON files and the DB.
+
+    Every file under tariffs/reference/ must deserialize cleanly into this model.
+    The ``tariff.charges`` and ``tariff.rules`` fields carry charge_ids/rule_ids
+    that reference entries in the ``charges`` and ``rules`` lists below.
+    """
+
+    tariff: Tariff
+    charges: list[Charge]
+    tou_schedule: TouSchedule | None = None
+    rules: list[Rule] = Field(default_factory=list)

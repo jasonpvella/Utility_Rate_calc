@@ -2,18 +2,49 @@
 
 ## Executive Snapshot
 
-**Current focus:** Phase 1 shipped to GitHub (`https://github.com/jasonpvella/Utility_Rate_calc.git`, branch `master`, 2 commits). Repo is live. Phase 2 is the immediate next milestone.
+**Current focus:** Phase 2 complete. Tariff library, classifier, and API are live. Phase 3 is the immediate next milestone.
 
-**Next session priorities (Phase 2):**
-- Stand up URDB client (`src/voltregistry/ingest/urdb_client.py`) — fetch tariff list for each of the 5 reference utility EIA IDs, cache to `data/raw/urdb/`.
-- Hand-curate the 5 reference tariff JSON files under `src/voltregistry/tariffs/reference/` — one per utility, one tariff per utility for v0.
-- Delivery/supply classifier (`src/voltregistry/tariffs/classifier.py`) — rule-based first pass per §7.
-- FastAPI endpoint `GET /utilities/{eia_id}/tariffs` — P2 demo gate.
-- Decision still open: confirm EIA IDs for all 5 reference utilities against the actual EIA-861 file once network is available. Seed data uses best-estimate IDs.
+**Next session priorities (Phase 3):**
+- Synthetic Walmart load profile (`src/voltregistry/load/synthetic.py`) — `synthesize_load(brand, climate_zone) -> np.ndarray[8760]`.
+- Tariff execution engine (`src/voltregistry/engine/tariff_engine.py`, `calculations.py`, `rules.py`) — full §10 contract: fixed → energy → demand → ratchet → riders → delivery filter → `CalculationResult`.
+- Golden bill tests (`tests/golden/`) — one utility-published sample bill per reference tariff, ≤1% variance. **No tariff ships without this.**
+- Decision still open: verify EIA IDs for the 5 reference utilities against the actual EIA-861 file (best-estimates used). Low risk — IDs appear correct from URDB cross-check.
+- Rate caveat from Opus: FPL GSLD-1 energy tiers are illustrative (FPL's actual GSLD-1 may not have an energy tier). Flag for manual review before writing the golden test.
 
 ---
 
 ## Historical Log
+
+### 2026-04-25 (Phase 2 build)
+
+**What changed:**
+- `TariffBundle` Pydantic model added to `tariffs/models.py` — self-contained payload (tariff + charges + tou_schedule + rules) used by both reference files and the DB.
+- `TariffTable` SQLModel added to `models.py` — persists full TariffBundle as a JSON column with key fields hoisted for SQL filtering.
+- Alembic migration `a1b2c3d4e5f6` adds the `tariff` table (chained from `d44d08015185`).
+- `src/voltregistry/ingest/urdb_client.py` — URDB API client, caches to `data/raw/urdb/eia_{eia_id}.json`, supports optional `URDB_API_KEY` env var (defaults to `DEMO_KEY`).
+- 5 reference tariff JSON bundles written to `src/voltregistry/tariffs/reference/` (Opus, high-stakes path): Entergy AR LGS-1, Duke Carolinas LGS, Oncor DISTR, Georgia Power LPS, FPL GSLD-1. All parse cleanly against `TariffBundle`, all have `delivery_supply_review_status: manually_reviewed`.
+- `src/voltregistry/tariffs/classifier.py` (Opus) — rule-based delivery/supply classifier per §7. `classify_charge()` and `classify_bundle()`. Market-context override for deregulated utilities (Oncor → all delivery). Smoke tests pass.
+- `src/voltregistry/api/main.py` — FastAPI app. Endpoints: `GET /healthz`, `GET /utilities/{eia_id}`, `GET /utilities/{eia_id}/tariffs` (P2 demo gate), `GET /utilities/{eia_id}/tariffs/{tariff_id}`. Phase 4 endpoints stubbed (501).
+- `scripts/bootstrap.py` updated: added Step 8 (`_upsert_tariffs`) to load reference JSON files into the DB on every run. Idempotent.
+- `pyproject.toml`: added `E402` and `B008` to ruff ignore list (scripts path-hack and FastAPI Depends patterns are intentional).
+- P2 demo gate validated: `GET /utilities/6452/tariffs` and `GET /utilities/40229/tariffs` both return structured tariff data with full eligibility, charge count, review status.
+
+**Delivery Standard:**
+- `ruff check src/ tests/ scripts/` — clean.
+- `mypy src/voltregistry --cache-dir /tmp/mypy_cache` — Success, 21 source files, no issues. (Sandbox note: mypy cache must use `--cache-dir /tmp/mypy_cache` due to mounted filesystem I/O constraints.)
+- `pytest -v` — 9/9 pass.
+- No engine changes in P2 — golden run not required (Phase 3 gate).
+
+**Rate caveats to resolve in P3 golden tests:**
+- Entergy AR LGS-1: SECA rider value and summer/winter base energy split are approximate.
+- Duke Carolinas LGS: TOU windows simplified; actual schedule has nuanced winter shoulder.
+- Oncor DISTR: TCRF moves with each TCOS filing; value is plausible but not pinned to specific filing.
+- Georgia Power LPS: modeled as generic LPS — multiple LPS variants exist (LPS-1, LPS-2, LPS-T).
+- FPL GSLD-1: energy tiers are illustrative — real GSLD-1 may not have an energy tier. **Flag for manual review before golden test.**
+
+**What's next:** Phase 3 — synthetic load profile, tariff execution engine, golden bill tests.
+
+---
 
 ### 2026-04-25 (GitHub push + housekeeping)
 

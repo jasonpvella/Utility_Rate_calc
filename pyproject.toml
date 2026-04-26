@@ -38,7 +38,9 @@ src = ["src"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
-ignore = ["E501"]
+# E402: scripts use sys.path.insert before imports — intentional
+# B008: FastAPI Depends() in function signatures is the canonical pattern
+ignore = ["E501", "E402", "B008"]
 
 [tool.mypy]
 python_version = "3.10"
