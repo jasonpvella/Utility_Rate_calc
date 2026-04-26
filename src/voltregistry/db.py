@@ -24,6 +24,11 @@ engine = create_engine(
 )
 
 
+def get_db_url() -> str:
+    """Return the SQLAlchemy database URL (used by scripts that create their own engine)."""
+    return _ENGINE_URL
+
+
 def create_db_and_tables() -> None:
     """Create all tables defined via SQLModel metadata (idempotent)."""
     # Ensure data/ directory exists

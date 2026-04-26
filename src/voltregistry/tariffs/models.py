@@ -197,7 +197,7 @@ class Utility(BaseModel):
 
 class HourRange(BaseModel):
     start: int = Field(ge=0, le=23)
-    end: int = Field(ge=0, le=23)
+    end: int = Field(ge=0, le=24)  # end-exclusive; 24 == end-of-day sentinel
 
 
 class TouPeriod(BaseModel):
