@@ -71,3 +71,49 @@ class TariffTable(SQLModel, table=True):
     end_date: str | None = Field(default=None)
     payload_json: str                # JSON-serialised TariffBundle
     last_updated: datetime = Field(default_factory=datetime.utcnow)
+
+
+class UtilityTariffUrlTable(SQLModel, table=True):
+    """One row per tariff source URL for a utility.
+
+    Tracks where tariff documents live so the extraction pipeline can fetch
+    and process them.  ``url_type`` distinguishes navigational portal pages
+    from directly downloadable documents.
+    """
+
+    __tablename__ = "utility_tariff_url"
+
+    id: int | None = Field(default=None, primary_key=True)
+    utility_eia_id: str = Field(foreign_key="utility.eia_id", index=True)
+    url: str
+    url_type: str = "tariff_page"   # "portal" | "tariff_page" | "document"
+    status: str = "pending"         # "pending" | "extracted" | "reviewed" | "failed"
+    notes: str = ""
+    last_fetched: datetime | None = Field(default=None)
+    last_updated: datetime = Field(default_factory=datetime.utcnow)
+
+
+class UtilityTariffInputsTable(SQLModel, table=True):
+    """One row per rate schedule extracted from a tariff document.
+
+    ``inputs_required`` is a JSON-serialised list of TariffInputType values.
+    ``voltage_levels`` is a JSON-serialised list of applicable voltage tier strings.
+    ``raw_extraction`` preserves the LLM output verbatim for audit and re-review.
+    """
+
+    __tablename__ = "utility_tariff_inputs"
+
+    id: int | None = Field(default=None, primary_key=True)
+    utility_eia_id: str = Field(foreign_key="utility.eia_id", index=True)
+    schedule_code: str = ""          # e.g. "GS-2", "LP-1", "LPS"
+    schedule_name: str               # e.g. "Large Power Service"
+    applicability_min_kw: float | None = Field(default=None)
+    applicability_max_kw: float | None = Field(default=None)
+    applicability_notes: str = ""
+    voltage_levels: str = "[]"       # JSON array of voltage tier strings
+    inputs_required: str = "[]"      # JSON array of TariffInputType values
+    source_url: str = ""
+    extraction_status: str = "extracted"  # "extracted" | "reviewed" | "needs_review"
+    confidence: float = 1.0
+    raw_extraction: str = ""         # LLM output verbatim — do not truncate
+    last_updated: datetime = Field(default_factory=datetime.utcnow)

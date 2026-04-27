@@ -67,15 +67,35 @@ def _cache_path(year: int) -> Path:
     return _RAW_DIR / f"eia861_{year}.zip"
 
 
+_ZIP_MAGIC = b"PK\x03\x04"
+
+
+def _is_valid_zip(data: bytes) -> bool:
+    return data[:4] == _ZIP_MAGIC
+
+
 def _download_zip(year: int, timeout: int = 60) -> bytes:
     cache = _cache_path(year)
     if cache.exists():
-        logger.info("EIA-861 %d: using cache %s", year, cache)
-        return cache.read_bytes()
+        data = cache.read_bytes()
+        if _is_valid_zip(data):
+            logger.info("EIA-861 %d: using cache %s", year, cache)
+            return data
+        logger.warning("EIA-861 %d: cached file is not a valid zip — deleting and re-downloading", year)
+        cache.unlink()
+
     url = _eia861_url(year)
     logger.info("EIA-861 %d: downloading %s", year, url)
     resp = httpx.get(url, timeout=timeout, follow_redirects=True)
     resp.raise_for_status()
+
+    if not _is_valid_zip(resp.content):
+        raise ValueError(
+            f"EIA-861 {year}: server returned non-zip content "
+            f"({len(resp.content)} bytes, content-type={resp.headers.get('content-type', '?')!r}) — "
+            "year may not be available yet"
+        )
+
     cache.write_bytes(resp.content)
     logger.info("EIA-861 %d: cached to %s (%d bytes)", year, cache, len(resp.content))
     return resp.content
@@ -85,11 +105,40 @@ def _find_utility_csv(zf: zipfile.ZipFile) -> str | None:
     """Locate the utility data CSV inside the ZIP (name varies by year)."""
     candidates = [n for n in zf.namelist() if "utility_data" in n.lower() and n.endswith(".csv")]
     if not candidates:
-        # Older ZIPs use 'Utility_Data_<year>.csv' or 'f861<year>_Utility.csv'
         candidates = [
             n for n in zf.namelist() if n.lower().endswith(".csv") and "utilit" in n.lower()
         ]
     return candidates[0] if candidates else None
+
+
+def _find_utility_xlsx(zf: zipfile.ZipFile) -> str | None:
+    """Locate the utility data xlsx inside the ZIP (EIA switched from CSV in 2023+)."""
+    candidates = [n for n in zf.namelist() if "utility_data" in n.lower() and n.endswith(".xlsx")]
+    if not candidates:
+        candidates = [
+            n for n in zf.namelist() if n.lower().endswith(".xlsx") and "utilit" in n.lower()
+        ]
+    return candidates[0] if candidates else None
+
+
+def _xlsx_rows_to_dicts(zf: zipfile.ZipFile, xlsx_name: str) -> list[dict[str, str]]:
+    """Read EIA-861 xlsx utility data — handles the 2-row merged header format."""
+    import pandas as pd
+
+    with zf.open(xlsx_name) as f:
+        # Row 0 is a merged category header; row 1 has actual column names
+        df = pd.read_excel(f, header=1, dtype=str)
+
+    # Normalise column names to match the CSV conventions used in _infer_* helpers
+    rename = {
+        "Utility Number": "UTILITY_ID",
+        "Utility Name": "UTILITY_NAME",
+        "State": "STATE",
+        "Ownership Type": "OWNERSHIP",
+    }
+    df = df.rename(columns=rename)
+    df = df.fillna("")
+    return df.to_dict(orient="records")
 
 
 def _infer_market_structure(row: dict[str, str]) -> str:
@@ -147,23 +196,20 @@ def load_utilities(year: int | None = None) -> list[dict[str, Any]]:
 
     with zipfile.ZipFile(io.BytesIO(raw)) as zf:
         csv_name = _find_utility_csv(zf)
-        if csv_name is None:
-            # Fall back: parse every CSV looking for UTILITY_ID column
-            for name in zf.namelist():
-                if name.endswith(".csv"):
-                    text = zf.read(name).decode("latin-1")
-                    if "UTILITY_ID" in text[:500]:
-                        csv_name = name
-                        break
+        xlsx_name = _find_utility_xlsx(zf) if csv_name is None else None
 
-        if csv_name is None:
-            raise RuntimeError(f"Could not find utility data CSV in EIA-861 {year} ZIP")
+        if csv_name is None and xlsx_name is None:
+            raise RuntimeError(f"Could not find utility data CSV or xlsx in EIA-861 {year} ZIP")
 
-        logger.info("EIA-861 %d: parsing %s", year, csv_name)
-        text = zf.read(csv_name).decode("latin-1")
-        reader = csv.DictReader(io.StringIO(text))
+        if csv_name:
+            logger.info("EIA-861 %d: parsing %s (CSV)", year, csv_name)
+            text = zf.read(csv_name).decode("latin-1")
+            rows: list[dict[str, str]] = list(csv.DictReader(io.StringIO(text)))
+        else:
+            logger.info("EIA-861 %d: parsing %s (xlsx)", year, xlsx_name)
+            rows = _xlsx_rows_to_dicts(zf, xlsx_name)  # type: ignore[arg-type]
 
-        for row in reader:
+        for row in rows:
             eia_id = row.get("UTILITY_ID", "").strip()
             name = row.get("UTILITY_NAME", "").strip()
             state = row.get("STATE", "").strip()

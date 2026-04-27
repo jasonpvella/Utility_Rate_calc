@@ -12,7 +12,7 @@ Pipeline steps:
     1. Load EIA Form 861 utility metadata (download or seed fallback)
     2. Load Walmart store locations (scrape or seed fallback)
     3. Load Sam's Club store locations (scrape or seed fallback)
-    4. Load HIFLD electric service territory polygons (download or seed fallback)
+    4. Load Census TIGER + EIA-861 service territory polygons (download or cache)
     5. Run geospatial territory join → site → utility_eia_id
     6. Persist utilities to SQLite
     7. Persist sites (with utility assignments) to SQLite
@@ -36,7 +36,11 @@ from sqlmodel import Session
 
 from voltregistry.db import create_db_and_tables, engine
 from voltregistry.ingest.eia_form_861 import load_utilities_with_fallback
-from voltregistry.ingest.hifld_territories import load_territories
+from voltregistry.ingest.hifld_territories import (
+    EIA_ID_COUNT_MIN,
+    POLYGON_COUNT_MIN,
+    load_territories,
+)
 from voltregistry.ingest.samsclub_scraper import load_stores as load_samsclub
 from voltregistry.ingest.walmart_scraper import load_stores as load_walmart
 from voltregistry.mapping.territory_join import join_sites_to_territories
@@ -202,7 +206,22 @@ def run(force_refresh: bool = False) -> None:
     # -----------------------------------------------------------------------
     logger.info("Step 5/8: Loading territory polygons")
     territories = load_territories(force_refresh=force_refresh)
-    logger.info("  → %d territory polygons", len(territories))
+    n_terr_polygons = len(territories)
+    n_terr_utilities = territories["eia_id"].nunique()
+    logger.info(
+        "  → %d territory polygons, %d distinct utility EIA IDs",
+        n_terr_polygons,
+        n_terr_utilities,
+    )
+    if n_terr_polygons < POLYGON_COUNT_MIN or n_terr_utilities < EIA_ID_COUNT_MIN:
+        logger.error(
+            "TERRITORY DATA QUALITY FAILURE: %d polygons / %d utilities — "
+            "minimum is 1500 polygons and 300 utilities.  "
+            "Re-run with --force-refresh to rebuild from Census + EIA-861.",
+            n_terr_polygons,
+            n_terr_utilities,
+        )
+        sys.exit(1)
 
     logger.info("Step 6/8: Running geospatial territory join")
     join_results_list = join_sites_to_territories(all_stores, territories=territories)
@@ -210,10 +229,19 @@ def run(force_refresh: bool = False) -> None:
 
     matched = sum(1 for r in join_results_list if r["utility_eia_id"] is not None)
     total = len(join_results_list)
+    distinct_utilities_matched = len({r["utility_eia_id"] for r in join_results_list if r["utility_eia_id"]})
     logger.info(
-        "  → %d/%d sites matched to a utility (%.1f%%)",
-        matched, total, 100.0 * matched / total if total else 0,
+        "  → %d/%d sites matched to a utility (%.1f%%) across %d distinct utilities",
+        matched, total, 100.0 * matched / total if total else 0, distinct_utilities_matched,
     )
+    if distinct_utilities_matched < 75:
+        logger.error(
+            "TERRITORY JOIN QUALITY FAILURE: only %d distinct utilities mapped — "
+            "expected 400+.  Territory data is likely stale or wrong.  "
+            "Re-run with --force-refresh.",
+            distinct_utilities_matched,
+        )
+        sys.exit(1)
 
     # -----------------------------------------------------------------------
     # Step 7: Persist utilities + sites to SQLite
@@ -245,10 +273,13 @@ def run(force_refresh: bool = False) -> None:
     print("VoltRegistry Bootstrap Complete")
     print("=" * 60)
     print(f"  Utilities loaded    : {util_count:>6,}")
+    print(f"  Territory polygons  : {n_terr_polygons:>6,}")
+    print(f"  Territory utilities : {n_terr_utilities:>6,}  (distinct EIA IDs in territory data)")
     print(f"  Walmart sites       : {wmt_count:>6,}")
     print(f"  Sam's Club sites    : {sam_count:>6,}")
     print(f"  Total sites         : {wmt_count + sam_count:>6,}")
-    print(f"  Utility match rate  : {100.0 * matched / total:.1f}%  ({matched}/{total})")
+    print(f"  Site→utility match  : {100.0 * matched / total:.1f}%  ({matched}/{total})")
+    print(f"  Distinct utils mapped: {distinct_utilities_matched:>5,}  ← county-level ceiling ~230; polygon-level would reach 400+")
     print(f"  Reference tariffs   : {tariff_count:>6,}")
     print(f"  Elapsed             : {elapsed:.1f}s")
     print("=" * 60)

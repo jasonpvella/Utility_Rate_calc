@@ -51,7 +51,6 @@ from voltregistry.db import get_db_url  # noqa: E402
 from voltregistry.ingest.urdb_client import fetch_tariffs  # noqa: E402
 from voltregistry.ingest.urdb_to_bundle import urdb_to_bundle  # noqa: E402
 from voltregistry.models import TariffTable, UtilityTable  # noqa: E402
-from voltregistry.tariffs.models import IngestionMethod  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,

@@ -2,16 +2,90 @@
 
 ## Executive Snapshot
 
-**Current focus:** Phase 4 complete (eligibility, comparison engine, 3 API endpoints). Full URDB sweep done across all 1,778 DB utilities — 34,497 tariffs in DB. URDB store coverage ceiling reached at ~20% (1,203/6,119 stores). The major IOUs serving 80% of Walmart stores are simply not in URDB.
+**Current focus:** Tariff Inputs Registry pipeline — for every utility serving Walmart/Sam's Club stores, identify which of 15 standardized billing inputs each applicable rate schedule requires.
+
+**What's built and working:**
+- Territory pipeline replaced: Census TIGER 2023 + EIA-861 Service Territory. Yields 3,093 polygons, 233 distinct utilities mapped to stores, 84.4% match rate. Hard validation gates prevent silent degradation.
+- `utility_tariff_url` + `utility_tariff_inputs` tables migrated and in DB.
+- 46 URLs seeded for top 30 gap utilities.
+- `scripts/extract_tariff_inputs.py` ready to run from Jason's Mac.
 
 **Next session priorities:**
-- **Decision required:** build direct utility scrapers for top 30 gap utilities (PDF/HTML tariff sheets → structured rate data) vs. proceed to Phase 5. Top 5 gaps alone (TVA, KCPL, NSP MN, Appalachian Power, Nevada Power) = 1,029 stores.
-- Top 30 gap EIA IDs (sorted by store count): 38 45 4 35 25 28 27 6454 47 29 5420 44 43 15 21 48 36 37 39 3672 23 14 14469 2 33 14470 5 22 26 5418
-- Golden tests use hand-calculated expected values (not utility-published sample bills). Replace with utility-certified worked examples before production.
+1. Run extraction from Jason's Mac: `python scripts/extract_tariff_inputs.py --limit 5 --eia-id 38,45,4,35,25` — verify output before bulk run
+2. Review extracted rows with `confidence < 0.7`; manually correct if needed
+3. Bulk run: `python scripts/extract_tariff_inputs.py` across all 46 pending URLs
+4. Golden tests still use hand-calculated expected values — replace with utility-published sample bills before production
 
 ---
 
 ## Historical Log
+
+### 2026-04-26 (Territory pipeline fix + CLAUDE.md hardened)
+
+**Problem diagnosed:** Territory join was producing only 74 distinct utilities instead of expected 400–800+. Root cause: the HIFLD ArcGIS REST endpoint for Electric Retail Service Territories was permanently removed from `services1.arcgis.com` in 2024/2025. Bootstrap was silently falling back to state bounding-box seed approximations (~74 utilities, ~121 polygons). Tell-tale sign: "Dunn County Electric Coop" appearing as dominant utility for large numbers of stores.
+
+**What changed:**
+
+*`src/voltregistry/ingest/hifld_territories.py` — complete rewrite:*
+- Replaced defunct HIFLD endpoint with Census TIGER 2023 county boundaries + EIA-861 Service Territory xlsx.
+- `_load_service_territory()` — reads `Service_Territory_YYYY.xlsx` from `data/raw/eia861_YYYY.zip`; 11,782 rows, 2,912 utility EIA IDs.
+- `_download_census_counties()` — downloads `cb_2023_us_county_20m.zip` from `census.gov` (~900 KB), returns GeoDataFrame of all US counties.
+- `_build_territory_gdf()` — primary-utility-per-county heuristic: for multi-utility counties, assign the utility with the most counties in that state.
+- `_validate_territories()` — hard validation gate: raises `RuntimeError` if < 1500 polygons or < 200 distinct utility EIA IDs. No silent fallback.
+- `_build_seed_territories()` stub now raises `RuntimeError` — seed approximation permanently removed.
+- `POLYGON_COUNT_MIN = 1500`, `EIA_ID_COUNT_MIN = 200` exported as constants.
+
+*`src/voltregistry/ingest/eia_form_861.py`:*
+- `_is_valid_zip()` — validates PK magic bytes before caching downloaded content.
+- `_download_zip()` — deletes and re-downloads if cached file is not a valid zip; raises `ValueError` instead of caching HTML error pages.
+- `_find_utility_xlsx()` + `_xlsx_rows_to_dicts()` — xlsx support for EIA-861 2023+ (EIA switched from CSV).
+
+*`scripts/bootstrap.py`:*
+- Imports `POLYGON_COUNT_MIN, EIA_ID_COUNT_MIN` from `hifld_territories` — no more hardcoded thresholds.
+- `sys.exit(1)` if territory checks fail; `sys.exit(1)` if distinct utilities mapped to stores < 75.
+- Summary block always prints polygon count and distinct utility count.
+
+*`CLAUDE.md`:*
+- Added **Territory Data** section documenting Census TIGER + EIA-861 approach, hard validation thresholds, expected bootstrap numbers, county-level ceiling explanation (~230 utilities mapped to stores), and `--force-refresh` recovery command.
+- Updated Critical Rule 1: changed HIFLD reference to Census TIGER.
+- Updated bootstrap docstring: "HIFLD" → "Census TIGER + EIA-861".
+
+**Bootstrap results after fix:**
+```
+Territory polygons  :  3,093
+Territory utilities :    278  distinct EIA IDs in territory data
+Site→utility match  :  84.4%  (4,793 / 5,685 stores)
+Distinct utils mapped:   233  county-level ceiling
+```
+
+**Delivery Standard:** ruff clean, mypy clean, pytest 94/94.
+
+**What's next:** Run tariff extraction pipeline from Jason's Mac.
+
+---
+
+### 2026-04-26 (Tariff Inputs Registry pivot — Phases 0+1+2 pipeline built)
+
+**Decision made:** Instead of building full tariff bundles for the 30 gap utilities, build a lighter "inputs registry" — for each utility + schedule, classify which of 15 standardized billing inputs are required. This is a classification task, not a full tariff digitization, and can be done at scale with Claude.
+
+**What changed:**
+
+*Phase 0 — Input taxonomy + schema:*
+- `src/voltregistry/tariffs/input_types.py` (NEW) — `TariffInputType` enum (15 types: monthly_kwh, billing_demand_kw, onpeak_demand_kw, offpeak_demand_kw, onpeak_kwh, offpeak_kwh, shoulder_kwh, coincident_peak_kw, reactive_demand_kvar, power_factor_pct, contract_demand_kw, ratchet_demand_kw, voltage_level, load_factor_pct, billing_period_days) + `INPUT_TYPE_DESCRIPTIONS` dict.
+- `src/voltregistry/models.py` (UPDATED) — Added `UtilityTariffUrlTable` (tracks tariff source URLs per utility, status lifecycle: pending → extracted/failed/reviewed) and `UtilityTariffInputsTable` (one row per schedule: schedule_code, schedule_name, applicability_min/max_kw, voltage_levels, inputs_required, confidence, raw_extraction).
+- `alembic/versions/f7a9b2c1d3e4_add_tariff_url_and_inputs_tables.py` (NEW) — migration creating both tables. **Not yet applied.**
+
+*Phase 1 — URL Registry:*
+- `scripts/seed_tariff_urls.py` (NEW) — seeds ~68 URL rows covering 29 EIA IDs (top 30 gap utilities by store count). Two URL types per utility where applicable: utility tariff page (`tariff_page`) and state PUC portal (`portal`). Idempotent — safe to re-run. **Not yet run.**
+
+*Phase 2 — Extraction pipeline:*
+- `scripts/extract_tariff_inputs.py` (NEW) — CLI script. Fetches pending URLs (HTML or PDF), calls Claude API with a structured extraction prompt targeting Walmart-scale (≥100 kW) schedules, parses JSON response, validates inputs against `VALID_INPUT_TYPES`, writes to `utility_tariff_inputs`. Flags `confidence < 0.7` rows as `needs_review`. Flags are: `--eia-id`, `--dry-run`, `--limit`, `--reprocess`, `--model`. **Not yet run.**
+
+**Status:** All code written, none of it applied or executed. Must run alembic upgrade → seed → extraction in that order.
+
+**What's next:** Apply migration + run extraction for top 5 gap utilities first; verify output before bulk run across all 30.
+
+---
 
 ### 2026-04-26 (Phase 4 complete + full URDB sweep + coverage analysis)
 

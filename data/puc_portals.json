@@ -1,0 +1,258 @@
+{
+  "_comment": "State PUC tariff filing portals. Use these to find tariff documents for any IOU in the state. Munis and co-ops are not regulated here — go to the utility website directly.",
+  "AK": {
+    "name": "Regulatory Commission of Alaska",
+    "portal_url": "https://rca.alaska.gov/RCAWeb/RCALibrary/TariffSearch.aspx",
+    "notes": "Search by utility name for electric tariff schedules"
+  },
+  "AL": {
+    "name": "Alabama Public Service Commission",
+    "portal_url": "https://www.psc.state.al.us/Utility_Information/Electric.aspx",
+    "notes": "Lists Alabama Power, Southern Company subsidiaries"
+  },
+  "AR": {
+    "name": "Arkansas Public Service Commission",
+    "portal_url": "https://www.apscservices.info/APSC/",
+    "notes": "Docket search — filter by utility name and electric tariff"
+  },
+  "AZ": {
+    "name": "Arizona Corporation Commission",
+    "portal_url": "https://azcc.gov/divisions/utilities/electric/tariffs",
+    "notes": "APS, TEP, UniSource tariffs listed here"
+  },
+  "CA": {
+    "name": "California Public Utilities Commission",
+    "portal_url": "https://www.cpuc.ca.gov/tariffs/",
+    "notes": "Full tariff books for PG&E, SCE, SDG&E. E-Tariff portal — search by schedule code"
+  },
+  "CO": {
+    "name": "Colorado Public Utilities Commission",
+    "portal_url": "https://puc.colorado.gov/electric-tariff-filings",
+    "notes": "Xcel PSCo, Black Hills, Holy Cross filings"
+  },
+  "CT": {
+    "name": "Connecticut Public Utilities Regulatory Authority",
+    "portal_url": "https://portal.ct.gov/PURA/Utility-Regulation/Electric/Tariffs",
+    "notes": "Eversource CT (CL&P), United Illuminating"
+  },
+  "DC": {
+    "name": "DC Public Service Commission",
+    "portal_url": "https://dcpsc.org/Utility-Information/Electric-Gas-and-Telephone-Utilities/",
+    "notes": "Pepco District of Columbia tariffs"
+  },
+  "DE": {
+    "name": "Delaware Public Service Commission",
+    "portal_url": "https://depsc.delaware.gov/electric/",
+    "notes": "Delmarva Power tariffs"
+  },
+  "FL": {
+    "name": "Florida Public Service Commission",
+    "portal_url": "https://www.floridapsc.com/utilities/electricgas/tariffs",
+    "notes": "FPL, Duke Energy Florida, Tampa Electric, Gulf Power tariff filings"
+  },
+  "GA": {
+    "name": "Georgia Public Service Commission",
+    "portal_url": "https://psc.ga.gov/utilities/electric/",
+    "notes": "Georgia Power (Southern Company) tariffs"
+  },
+  "HI": {
+    "name": "Hawaii Public Utilities Commission",
+    "portal_url": "https://puc.hawaii.gov/energy/electric/",
+    "notes": "HECO, MECO, HELCO tariffs"
+  },
+  "IA": {
+    "name": "Iowa Utilities Board",
+    "portal_url": "https://iub.iowa.gov/regulated-utilities/electric/tariffs",
+    "notes": "MidAmerican Energy, Alliant Energy, Interstate Power tariffs"
+  },
+  "ID": {
+    "name": "Idaho Public Utilities Commission",
+    "portal_url": "https://www.puc.idaho.gov/tariff/",
+    "notes": "Idaho Power, Rocky Mountain Power (PacifiCorp), Avista tariffs"
+  },
+  "IL": {
+    "name": "Illinois Commerce Commission",
+    "portal_url": "https://www.icc.illinois.gov/utilities/electric/tariffs",
+    "notes": "ComEd, Ameren Illinois tariff filings — large C&I schedules under 'General Service Large Load'"
+  },
+  "IN": {
+    "name": "Indiana Utility Regulatory Commission",
+    "portal_url": "https://www.in.gov/iurc/electric-utilities/electric-tariffs/",
+    "notes": "IPL (AES Indiana), Duke Indiana, Indiana Michigan Power, NIPSCO"
+  },
+  "KS": {
+    "name": "Kansas Corporation Commission",
+    "portal_url": "https://kcc.ks.gov/electric-tariff-filings/",
+    "notes": "Evergy Kansas (formerly KCPL/Westar), Evergy Metro tariffs"
+  },
+  "KY": {
+    "name": "Kentucky Public Service Commission",
+    "portal_url": "https://psc.ky.gov/pscecf/",
+    "notes": "LG&E, Kentucky Utilities (PPL) tariff filings — search e-filing docket"
+  },
+  "LA": {
+    "name": "Louisiana Public Service Commission",
+    "portal_url": "https://lpsc.louisiana.gov/electric-tariffs",
+    "notes": "Entergy Louisiana, Cleco, Southwestern Electric Power tariffs"
+  },
+  "MA": {
+    "name": "Massachusetts Department of Public Utilities",
+    "portal_url": "https://www.mass.gov/info-details/electric-utility-tariffs",
+    "notes": "Eversource MA, National Grid MA, Unitil tariffs"
+  },
+  "MD": {
+    "name": "Maryland Public Service Commission",
+    "portal_url": "https://webapp.psc.state.md.us/newSearch/tariff/index.cfm",
+    "notes": "BGE, Pepco MD, Delmarva MD, Potomac Edison tariff search"
+  },
+  "ME": {
+    "name": "Maine Public Utilities Commission",
+    "portal_url": "https://www.maine.gov/mpuc/regulated-utilities/electric/",
+    "notes": "Central Maine Power, Versant Power tariffs"
+  },
+  "MI": {
+    "name": "Michigan Public Service Commission",
+    "portal_url": "https://www.michigan.gov/mpsc/commission/electric",
+    "notes": "DTE Electric, Consumers Energy tariff filings"
+  },
+  "MN": {
+    "name": "Minnesota Public Utilities Commission",
+    "portal_url": "https://www.edockets.state.mn.us/EFiling/search.do",
+    "notes": "Xcel Energy (NSP MN), Minnesota Power, Otter Tail — search electric tariff filings"
+  },
+  "MO": {
+    "name": "Missouri Public Service Commission",
+    "portal_url": "https://www.efis.psc.mo.gov/mpsc/tariff.asp",
+    "notes": "AmerenMissouri, Evergy Missouri Metro (KCPL), KCP&L Greater MO tariffs"
+  },
+  "MS": {
+    "name": "Mississippi Public Service Commission",
+    "portal_url": "https://www.psc.ms.gov/electric/",
+    "notes": "Entergy Mississippi, Mississippi Power, Singing River tariffs"
+  },
+  "MT": {
+    "name": "Montana Public Service Commission",
+    "portal_url": "https://psc.mt.gov/Utilities/Electric/Tariffs",
+    "notes": "NorthWestern Energy tariffs"
+  },
+  "NC": {
+    "name": "North Carolina Utilities Commission",
+    "portal_url": "https://www.ncuc.net/electric/",
+    "notes": "Duke Energy Carolinas, Duke Energy Progress, Dominion NC tariffs"
+  },
+  "ND": {
+    "name": "North Dakota Public Service Commission",
+    "portal_url": "https://www.psc.nd.gov/electric/tariffs/",
+    "notes": "Montana-Dakota Utilities, Xcel NSP ND, Otter Tail ND tariffs"
+  },
+  "NE": {
+    "name": "Nebraska Power Review Board",
+    "portal_url": "https://www.nppd.com/rates-and-tariffs/",
+    "notes": "Nebraska is mostly public power (NPPD, LES, OPPD) — no traditional PUC. Go to each utility website directly."
+  },
+  "NH": {
+    "name": "New Hampshire Public Utilities Commission",
+    "portal_url": "https://www.puc.nh.gov/Utilities/Electric/Tariffs.html",
+    "notes": "Eversource NH, Unitil NH, New Hampshire Electric Cooperative tariffs"
+  },
+  "NJ": {
+    "name": "New Jersey Board of Public Utilities",
+    "portal_url": "https://www.njbpu.com/energy/electric/tariffs",
+    "notes": "PSE&G, JCP&L (FirstEnergy), Atlantic City Electric tariffs"
+  },
+  "NM": {
+    "name": "New Mexico Public Regulation Commission",
+    "portal_url": "https://www.nmprc.state.nm.us/utilities/elec.htm",
+    "notes": "PNM (Public Service Company of NM), El Paso Electric, Southwestern Public Service tariffs"
+  },
+  "NV": {
+    "name": "Nevada Public Utilities Commission",
+    "portal_url": "https://pucweb1.state.nv.us/TariffSearch/",
+    "notes": "NV Energy (Nevada Power + Sierra Pacific) tariff filings — both rate zones searchable here"
+  },
+  "NY": {
+    "name": "New York Department of Public Service",
+    "portal_url": "https://www3.dps.ny.gov/W/PSCWeb.nsf/All/2A94FAB2A4C9E3C085257687006F39CA",
+    "notes": "Con Ed, National Grid NY, NYSEG, Central Hudson, Orange & Rockland tariff filings"
+  },
+  "OH": {
+    "name": "Public Utilities Commission of Ohio",
+    "portal_url": "https://puco.ohio.gov/utilities/electricity/electric-utilities/",
+    "notes": "Duke Energy Ohio, AEP Ohio, FirstEnergy Ohio (Ohio Edison/CEI/TE), Dayton Power & Light"
+  },
+  "OK": {
+    "name": "Oklahoma Corporation Commission",
+    "portal_url": "https://www.occeweb.com/EP/electric.htm",
+    "notes": "Oklahoma Gas & Electric (OG&E), Public Service Co of Oklahoma (PSO/AEP) tariffs"
+  },
+  "OR": {
+    "name": "Oregon Public Utility Commission",
+    "portal_url": "https://www.oregon.gov/puc/utilities/Pages/Electric.aspx",
+    "notes": "Portland General Electric, Pacific Power (PacifiCorp), Idaho Power OR, Avista OR tariffs"
+  },
+  "PA": {
+    "name": "Pennsylvania Public Utility Commission",
+    "portal_url": "https://www.puc.pa.gov/electric/tariffs/",
+    "notes": "PECO, PPL Electric, West Penn Power, Duquesne Light, MetEd, Penelec tariffs"
+  },
+  "RI": {
+    "name": "Rhode Island Public Utilities Commission",
+    "portal_url": "https://www.ripuc.org/utilities/electric/tariffs.php",
+    "notes": "National Grid Rhode Island tariffs"
+  },
+  "SC": {
+    "name": "South Carolina Office of Regulatory Staff",
+    "portal_url": "https://regulatorystaff.sc.gov/electric-tariffs/",
+    "notes": "Duke Energy Carolinas SC, Duke Energy Progress SC, Dominion SC tariffs"
+  },
+  "SD": {
+    "name": "South Dakota Public Utilities Commission",
+    "portal_url": "https://puc.sd.gov/electric/tariffs/",
+    "notes": "Montana-Dakota Utilities, Black Hills Power, Northern States Power SD tariffs"
+  },
+  "TN": {
+    "name": "Tennessee Valley Authority (FERC-regulated federal utility)",
+    "portal_url": "https://www.tva.com/energy/our-power-system/generation/rate-schedules",
+    "notes": "TVA is a federal utility, not state-regulated. Rate schedules published directly on tva.com. Large Power (LP) rate is the primary C&I tariff."
+  },
+  "TX": {
+    "name": "Public Utility Commission of Texas",
+    "portal_url": "https://interchange.puc.texas.gov/",
+    "notes": "Delivery-only IOUs: Oncor, CenterPoint, AEP Texas, TNMP. Texas is deregulated — look for wires/T&D tariffs specifically. Retail rates are through REPs, not here."
+  },
+  "UT": {
+    "name": "Utah Public Service Commission",
+    "portal_url": "https://psc.utah.gov/utilities/electric/tariffs/",
+    "notes": "Rocky Mountain Power (PacifiCorp), Dominion Energy Utah tariffs"
+  },
+  "VA": {
+    "name": "Virginia State Corporation Commission",
+    "portal_url": "https://www.scc.virginia.gov/pages/Electricity-Companies",
+    "notes": "Dominion Energy Virginia, Appalachian Power (AEP), Rappahannock Electric Cooperative tariffs"
+  },
+  "VT": {
+    "name": "Vermont Department of Public Service",
+    "portal_url": "https://publicservice.vermont.gov/content/electric-utility-tariffs",
+    "notes": "Green Mountain Power, Central Vermont Public Service tariffs"
+  },
+  "WA": {
+    "name": "Washington Utilities and Transportation Commission",
+    "portal_url": "https://www.utc.wa.gov/regulated-industries/utilities/electric-utilities",
+    "notes": "Puget Sound Energy, Pacific Power WA (PacifiCorp), Avista WA, Pacific Gas Transmission tariffs"
+  },
+  "WI": {
+    "name": "Wisconsin Public Service Commission",
+    "portal_url": "https://psc.wi.gov/Pages/AppsAndTools/tariffs.aspx",
+    "notes": "WE Energies (Wisconsin Electric), WPS, Madison Gas & Electric, Alliant Energy WI tariffs"
+  },
+  "WV": {
+    "name": "West Virginia Public Service Commission",
+    "portal_url": "https://www.psc.state.wv.us/Scripts/tariffs/",
+    "notes": "Appalachian Power (AEP), Monongalia Power, Wheeling Power tariffs"
+  },
+  "WY": {
+    "name": "Wyoming Public Service Commission",
+    "portal_url": "https://psc.wyo.gov/electric/tariffs/",
+    "notes": "Rocky Mountain Power (PacifiCorp), Montana-Dakota Utilities WY, Black Hills Power WY tariffs"
+  }
+}
